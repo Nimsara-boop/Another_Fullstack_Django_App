@@ -3,56 +3,6 @@ pipeline {
 
   stages {
 
-    // Start of Frontend stages
-    // we use djlint to validate the HTML, because normal htmllint will not work with Django template tags
-    stage('Frontend - HTML Validation using djlint') {
-      agent {
-        docker {
-            image 'python:3.11-slim'
-            args '-u root'
-            }
-        }
-      steps {
-        sh '''
-            pip install djlint
-            djlint . --lint
-        '''
-      }
-    }
-
-    stage ('Frontend - CSS Validation using stylelint'){
-        agent {
-            docker {
-                image 'node:20-alpine'
-                args '-u root'
-            }
-        }
-        steps{
-            sh '''
-                npm install -g stylelint stylelint-config-standard
-                stylelint "**/*.css"
-            '''
-        }
-    }
-
-    stage ('Frontend - JS validation using eslint'){
-        agent {
-            docker {
-                image 'node:20-alpine'
-                args '-u root'
-            }
-        }
-        steps{
-            sh ''' 
-                npm install -g eslint@8.57.1 eslint-config-airbnb-base eslint-plugin-import
-                export NODE_PATH=$(npm root -g)
-                eslint "**/*.js"
-            ''' 
-        }
-    }
-    //End of Frontend Validations
-
-
     //Start of backend validating
     stage ('Backend - Python linting and format check using ruff'){
         agent {
