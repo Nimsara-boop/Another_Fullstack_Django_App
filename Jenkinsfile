@@ -36,6 +36,7 @@ pipeline {
                     python manage.py test
             '''
         }
+        }
     }
     // end of Backend Validation
 
@@ -168,46 +169,7 @@ pipeline {
                         '''
                     }
             }
-/*
-            //Start of Gunicorn test
-            stage('Start and hit endpoint with Gunicorn'){
-                agent {docker {image 'docker'}}
-// for this, we need a "health endpoint" 
-                steps{
-                    sh '''
-                        apt-get update
-                        apt-get install -y curl
 
-                        pip install -r requirements.txt
-
-                        gunicorn myproject.wsgi:application --bind 127.0.0.1:8000 &
-                        GUNICORN_PID=$!
-
-                        GUNICORN_READY=false
-                        for i in {1..30}; do
-                            if curl -fs https://localhost:8000/health/; then
-                            GUNICORN_READY=true
-                                echo "Gunicorn is ready and healthy"
-                                break
-                            fi
-
-                            echo "Waiting for Gunicorn...."
-                            sleep 1
-                        done
-
-                        if ["$GUNICORN_READY" != "true"]; then
-                            echo "Gunicron failed to start"
-                            exit 1
-                        fi
-
-                        kill $GUNICORN_PID
-                    '''
-                }
-            }
-            // End of Gunicorn check 
-
-
-            */
     stage('Docker Build'){
         agent {docker {image 'docker'}}
         steps{
@@ -222,7 +184,3 @@ pipeline {
 
   }
 }
-
-
-
-
