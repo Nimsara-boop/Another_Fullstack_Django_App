@@ -14,28 +14,80 @@ pipeline {
         steps{
             catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                 sh ''' 
-                    echo 'Backend - Python linting and format check using ruff'
                     pip install ruff
                     ruff check . --fix
                     ruff format --check
-
-
-                    echo 'Backend - checks for setup mistakes in manage.py'
+                '''
+            }
+        }
+    }
+    stage ('Backend - checks for setup mistakes in manage.py'){
+        agent{
+            docker {
+                image 'python:3.11-slim'
+                args '-u root'
+            }
+        }
+        steps{
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                sh ''' 
                     pip install -r requirements.txt
                     python manage.py check
- 
-                    echo 'Backend - checks whether we are safe to go live'
+                '''
+            }
+        }
+    }
+
+    stage ('Backend - checks whether we are safe to go live'){
+        agent{
+            docker {
+                image 'python:3.11-slim'
+                args '-u root'
+            }
+        }
+        steps{
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                sh ''' 
                     pip install -r requirements.txt
                     python manage.py check --deploy
+                '''
+            }
+        }
+        }
 
-                    echo 'Backend - checks whether the python code for the database structure (the models) are updated in the migration files'                    
-                    python manage.py makemigrations --check --dry-run
 
-                    echo 'Backend - catches failing tests for the written tests'                    
+    stage ('Backend - checks whether the python code for the database structure (the models) are updated in the migration files'){
+        agent{
+            docker {
+                image 'python:3.11-slim'
+                args '-u root'
+            }
+        }
+        steps{
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                sh ''' 
                     pip install -r requirements.txt
-                    python manage.py test
+                  python manage.py makemigrations --check --dry-run
+            '''
+            }
+        }
+    }
+
+    stage ('Backend - catches failing tests for the written tests'){
+        agent {
+            docker {
+                image 'python:3.11-slim'
+                args '-u root'
+            }
+        }
+        steps{
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                sh ''' 
+                pip install -r requirements.txt
+                python manage.py test
             '''
         }
+    }
     }
     // end of Backend Validation
 
