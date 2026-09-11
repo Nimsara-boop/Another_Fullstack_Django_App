@@ -5,7 +5,7 @@ pipeline {
     triggers {
     githubPush()
   }
-  
+
   stages {
     //Start of backend validating
     stage ('Backend - Python linting and format check using ruff'){
@@ -56,6 +56,7 @@ pipeline {
                 ){c -> docker.image('python:3.11-slim').inside("--link ${c.id}:postgres"){
                     sh''' 
                     apt-get update && apt-get install -y libpq-dev gcc netcat-openbsd
+                    apk add --no-cache python3 py3-pip curl
                     pip install -r requirements.txt
 
                     until nc -z postgres 5432; do
@@ -69,11 +70,11 @@ pipeline {
                     python manage.py test
                     '''
                 }
-
-                }
                 }
             }
         }
+    
+    }
         // End of Database checks
 
 
