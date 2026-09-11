@@ -3,6 +3,14 @@ pipeline {
 
   stages {
 
+    trigger{
+        push{
+            branches{
+                include 'main'
+            }
+        }
+    }
+
     //Start of backend validating
     stage ('Backend - Python linting and format check using ruff'){
         agent {
@@ -51,9 +59,6 @@ pipeline {
                     '-e POSTGRES_DB=testdb -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -p 5432:5432'
                 ){c -> docker.image('python:3.11-slim').inside("--link ${c.id}:postgres"){
                     sh''' 
-                        whoami
-    pwd
-    ls -la
                     apt-get update && apt-get install -y libpq-dev gcc netcat-openbsd
                     pip install -r requirements.txt
 
