@@ -1,16 +1,12 @@
 pipeline {
   agent none
 
+
+    triggers {
+    githubPush()
+  }
+  
   stages {
-
-    trigger{
-        push{
-            branches{
-                include 'main'
-            }
-        }
-    }
-
     //Start of backend validating
     stage ('Backend - Python linting and format check using ruff'){
         agent {
