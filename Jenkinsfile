@@ -48,10 +48,7 @@ pipeline {
             script {
                 docker.image('postgres:16').withRun( 
             //withRun means "start the container (postgres:16), run wtvr code is inside the {}, and auto stop/delte the container afterwards"
-                    '''-e POSTGRES_DB=testdb \ 
-                    -e POSTGRES_USER=testuser \
-                    -e POSTGRES_PASSWORD=testpass \
-                    -p 5432:5432'''
+                    '-e POSTGRES_DB=testdb -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -p 5432:5432'
                 ){c -> docker.image('python:3.11-slim').inside("--link ${c.id}:postgres"){
                     sh''' 
                     apt-get update && apt-get install -y libpq-dev gcc netcat-openbsd
