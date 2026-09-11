@@ -48,9 +48,9 @@ pipeline {
             script {
                 docker.image('postgres:16').withRun( 
             //withRun means "start the container (postgres:16), run wtvr code is inside the {}, and auto stop/delte the container afterwards"
-                    '''-e POSTGRES_DB=testdb
-                    -e POSTGRES_USER=testuser
-                    -e POSTGRES_PASSWORD=testpass
+                    '''-e POSTGRES_DB=testdb \ 
+                    -e POSTGRES_USER=testuser \
+                    -e POSTGRES_PASSWORD=testpass \
                     -p 5432:5432'''
                 ){c -> docker.image('python:3.11-slim').inside("--link ${c.id}:postgres"){
                     sh''' 
@@ -77,7 +77,7 @@ pipeline {
 
 
         // Start of Celery and Redis for Django checks
-        stage ('Celery and Redis Integration'){
+    stage ('Celery and Redis Integration'){
             agent any
             steps{
                     sh''' 
@@ -167,8 +167,8 @@ pipeline {
                         echo "Nginx conf is VALID"        
 
                         '''
-                    }
-            }
+                }
+    }
 
     stage('Docker Build'){
         agent {docker {image 'docker'}}
